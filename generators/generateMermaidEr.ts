@@ -12,6 +12,7 @@ export function generateMermaidEr(entities: Entity[], outputDir: string) {
 
   for (const entity of entities) {
     for (const field of entity.fields) {
+      console.log("field ==> ", field);
       if (field.kind === "relation") {
         const from = entity.name;
         const to = field.type;
@@ -22,9 +23,13 @@ export function generateMermaidEr(entities: Entity[], outputDir: string) {
   }
 
   const uniqueRelations = [...new Set(relations)];
+  console.log("uniqueRelations ==> ", uniqueRelations);
   lines.push(...uniqueRelations);
 
   const filePath = path.join(outputDir, "domain.er.mmd");
   fs.mkdirSync(outputDir, { recursive: true });
   fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
 }
+
+// TODO: улучшить генерацию связей и, при необходимости,
+// добавить альтернативный вывод в формате PlantUML (.puml).

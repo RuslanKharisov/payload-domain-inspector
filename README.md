@@ -1,55 +1,74 @@
-payload-domain-inspector
-Утилита для инди-разработчиков на Payload CMS, которая анализирует файл payload-types.ts и генерирует компактную доменную схему (аналог Prisma schema) и ER-диаграмму в формате Mermaid.
-✨ Зачем это нужно?
+# payload-domain-inspector
 
-- Быстрый старт: Мгновенно разберитесь в структуре чужого или старого Payload-проекта.
-- Коммуникация: Наглядно объясните архитектуру базы данных команде или заказчику.
-- Обучение и докс: Идеально подходит для использования в документации или обучающих курсах (например, в курсе «Payload для инди-разработчиков»).
+Утилита для инди‑разработчиков на Payload CMS, которая анализирует `payload-types.ts` и генерирует компактную доменную схему (аналог Prisma schema) и ER‑диаграмму в формате Mermaid. [payloadcms](https://payloadcms.com/docs/typescript/generating-types)
 
-🚀 Установка
+## ✨ Зачем это нужно
 
-npm install --save-dev payload-domain-inspector# или запуск без установки
+- **Быстрый старт:** мгновенно разобраться в структуре чужого или «заброшенного» Payload‑проекта.
+- **Коммуникация:** наглядно объяснить архитектуру данных команде или заказчику.
+- **Обучение и документация:** удобно использовать в доке и обучающих материалах (например, в курсе «Payload для инди‑разработчиков»).
+
+## 🚀 Установка
+
+```bash
+npm install --save-dev payload-domain-inspector
+# или запуск без установки
 npx payload-domain-inspector ./payload-types.ts
+```
 
-🛠 Использование
-Запустите утилиту в корне проекта, где находится файл типов:
+## 🛠 Использование
 
+Запустите утилиту в корне проекта, где находится `payload-types.ts`:
+
+```bash
 npx payload-domain-inspector ./payload-types.ts
+```
 
-По умолчанию создаются три файла:
+По умолчанию будут сгенерированы файлы в директории `./domain`:
 
-1.  domain-schema.ts — типизированный список сущностей и полей.
-2.  domain.er.mmd — ER-диаграмма для визуализации в Mermaid.
-3.  domain-summary.md — текстовое описание сущностей и связей.
+1. `domain-schema.ts` — список сущностей и полей в компактном DSL.
+2. `domain.er.mmd` — ER‑диаграмма для визуализации в Mermaid. [mermaid.js](http://mermaid.js.org/syntax/entityRelationshipDiagram.html)
+3. `domain-summary.md` — текстовое описание сущностей и их полей.
 
-⚙️ Конфигурация
-Для гибкой настройки создайте файл payload-domain.config.json:
+## ⚙️ Конфигурация
 
+Для гибкой настройки создайте `payload-domain.config.json` в корне проекта:
+
+```json
 {
-"input": "./payload-types.ts",
-"outputDir": "./domain",
-"includeEntities": ["User", "Tenant", "Product", "Stock", "Warehouse"],
-"ignoreFields": ["createdAt", "updatedAt", "version"],
-"formats": ["ts", "mermaid", "md"]
+  "input": "./payload-types.ts",
+  "outputDir": "./domain",
+  "includeEntities": ["User", "Tenant", "Product", "Stock", "Warehouse"],
+  "ignoreFields": ["id", "createdAt", "updatedAt", "version"],
+  "ignoreEntities": ["Media", "Form", "Search"],
+  "formats": ["ts", "mermaid", "md"]
 }
+```
 
 После этого утилиту можно запускать без аргументов:
 
+```bash
 npx payload-domain-inspector
+```
 
-📂 Встраивание в проект
-Добавьте команду в ваш package.json:
+## 📂 Встраивание в проект
 
+Добавьте скрипт в `package.json`:
+
+```json
 {
-"scripts": {
-"domain:generate": "payload-domain-inspector"
+  "scripts": {
+    "domain:generate": "payload-domain-inspector"
+  }
 }
-}
+```
 
 Теперь генерировать схему можно одной командой:
 
+```bash
 npm run domain:generate
+```
 
 ---
 
-💡 Интересный факт: В рамках курса «Payload для инди-разработчиков» (модуль «Утилита для чтения проекта») мы пошагово разбираем внутреннее устройство этого инструмента и реализуем его с нуля.
+💡 В рамках курса «Payload для инди‑разработчиков» (модуль «Утилита для чтения проекта») утилита разбирается и реализуется пошагово — от парсинга `payload-types.ts` до генерации схемы и ER‑диаграммы.
