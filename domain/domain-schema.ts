@@ -2,14 +2,251 @@
 // Domain schema (compact view)
 
 entity Product {
-  id: ID
-  title: string
+  name: string
   sku: string
+  shortDescription?: string | null
+  productCategory?: ProductCategory
+  productImage?: Media
+  images?: | {
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null
   brand?: Brand
+  layout?: (ContentBlock | MediaBlock | CallToActionBlock)[] | null
+  slug?: string | null
+  sku_normalized?: string | null
+}
+
+entity ProductCategory {
+  title: string
+  title_en?: string | null
+  description?: string | null
+  parent?: ProductCategory
+  breadcrumb?: string | null
+  depth?: number | null
+  isPromoted?: boolean | null
+  productCount?: number | null
+  slug?: string | null
+}
+
+entity Brand {
+  name: string
+  description?: string | null
+  isPromoted?: boolean | null
+  productCount?: number | null
+  slug?: string | null
+}
+
+entity Category {
+  title: string
+  slug?: string | null
+  parent?: Category
+  breadcrumbs?: | {
+        doc?: (number | null) | Category;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null
+}
+
+entity User {
+  username: string
+  roles?: ('super-admin' | 'admin' | 'user' | 'content-editor')[] | null
+  tenants?: | {
+        tenant: number | Tenant;
+        roles: ('tenant-admin' | 'tenant-viewer')[];
+        id?: string | null;
+      }[]
+    | null
+  email: string
+  resetPasswordToken?: string | null
+  resetPasswordExpiration?: string | null
+  salt?: string | null
+  hash?: string | null
+  _verified?: boolean | null
+  _verificationToken?: string | null
+  loginAttempts?: number | null
+  lockUntil?: string | null
+  sessions?: | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null
+  password?: string | null
+  collection: 'users'
+}
+
+entity Tenant {
+  slug?: string | null
+  name: string
+  domain?: string | null
+  requestEmail: string
+  warehouse?: Warehouse
+  allowPublicRead?: boolean | null
+  accountDetailsSubmitted?: boolean | null
+  apiUrl?: string | null
+  apiToken?: string | null
+  apiType?: ('google' | 'erp' | 'custom') | null
+  inn?: string | null
+  status?: ('ACTIVE' | 'LIQUIDATING' | 'LIQUIDATED' | 'BANKRUPT' | 'REORGANIZING') | null
+  layout?: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[] | null
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  }
+}
+
+entity Warehouse {
+  tenant?: Tenant
+  title: string
+  warehouse_address: Address
+  selectedAddressData?: | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  capacity?: number | null
+}
+
+entity Address {
+  fias_id: string
+  kladr_id?: string | null
+  city?: string | null
+  region?: string | null
+  street?: string | null
+  house?: string | null
+  fullAddress?: string | null
+  geo_lat?: string | null
+  geo_lon?: string | null
+  country_iso_code?: string | null
+}
+
+entity Icon {
+  label: string
+  key: string
+  url?: string | null
+  thumbnailURL?: string | null
+  filename?: string | null
+  mimeType?: string | null
+  filesize?: number | null
+  width?: number | null
+  height?: number | null
+  focalX?: number | null
+  focalY?: number | null
+  sizes?: {}
 }
 
 entity Stock {
-  id: ID
-  product: Product
+  tenant?: Tenant
   quantity: number
+  product: Product
+  price?: number | null
+  currency: Currency
+  condition?: ('НОВЫЙ С ЗАВОДА' | 'НОВЫЙ ИЗЛИШЕК' | 'Б/У' | 'ВОССТАНОВЛЕН') | null
+  expectedDelivery?: string | null
+  warranty?: number | null
+  warehouse?: Warehouse
+  title_in_admin?: string | null
+  _city?: string | null
+  _region?: string | null
+  isPromoted?: boolean | null
+}
+
+entity Currency {
+  code: string
+  name: string
+  symbol?: string | null
+}
+
+entity CompanyProject {
+  tenant?: Tenant
+  name: string
+}
+
+entity CompanyCertification {
+  tenant?: Tenant
+  name: string
+}
+
+entity CompanyPost {
+  tenant?: Tenant
+  title: string
+  slug: string
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  }
+}
+
+entity Subscription {
+  tenant?: Tenant
+  startDate: string
+  endDate?: string | null
+  tariff: Tariff
+  status?: ('active' | 'inactive' | 'pending_payment' | 'expired') | null
+}
+
+entity Tariff {
+  name: string
+  price: number
+  description?: string | null
+  benefits?: | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null
+  features: ('CANT_ANY' | 'CAN_MANAGE_STOCK' | 'CAN_CREATE_POSTS' | 'CAN_PROMOTE_PRODUCTS')[]
+}
+
+entity CompanyType {
+  name: string
+}
+
+entity Click {
+  companyId?: string | null
+  tenant?: Tenant
+  src: 'web' | 'ai' | 'telegram' | 'email'
+  ctx?: string | null
+  query?: string | null
+  target: string
+  ip?: string | null
+  userAgent?: string | null
+}
+
+entity Redirect {
+  from: string
+  to?: {
+    type?: ('reference' | 'custom') | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+  }
 }
